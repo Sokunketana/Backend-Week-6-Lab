@@ -1,4 +1,4 @@
-import * as articleRepository from "../repositories/mockArticleRepository.js";
+import * as articleRepository from "../repositories/sqlArticleRepository.js";
 
 // TODO : Change articleRepository to use the sqlArticleRepository
 
@@ -43,7 +43,7 @@ export async function updateArticle(req, res) {
   try {
     const updatedArticle = await articleRepository.updateArticle(
       req.params.id,
-      req.body
+      req.body,
     );
     if (!updatedArticle) {
       return res.status(404).json({ message: "Article not found" });
@@ -62,6 +62,19 @@ export async function deleteArticle(req, res) {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting article:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// GET /api/journalists/:id/articles
+export async function getArticlesByJournalist(req, res) {
+  try {
+    const journalistId = req.params.id;
+    const articles =
+      await articleRepository.getArticlesByJournalistId(journalistId);
+    res.json(articles);
+  } catch (error) {
+    console.error("Error fetching articles by journalist:", error);
     res.status(500).json({ message: "Server error" });
   }
 }

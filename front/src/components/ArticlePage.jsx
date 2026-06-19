@@ -1,9 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getArticleById } from "../services/api";
 
 export default function ArticlePage() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,12 +14,10 @@ export default function ArticlePage() {
     fetchArticle();
   }, []);
 
-
   const fetchArticle = async () => {
     try {
       setLoading(true);
-
-      const found = getArticleById(id);
+      const found = await getArticleById(id); // fixed: was missing await
       if (found) {
         setArticle(found);
         setError("");
@@ -38,15 +37,52 @@ export default function ArticlePage() {
   if (!article) return <div>No article found.</div>;
 
   return (
-    <div>
+    <div className="article-page">
       <h2>{article.title}</h2>
       <p>{article.content}</p>
-      <div>
-        <strong>Journalist:</strong> {article.journalist}
-      </div>
-      <div>
+
+      <div className="article-meta">
         <strong>Category:</strong> {article.category}
       </div>
+
+      <div className="article-journalist-info">
+        <strong>Journalist:</strong>{" "}
+        {article.journalist_name ? (
+          article.journalist_id ? (
+            <button
+              className="button-link"
+              onClick={() =>
+                navigate(`/journalists/${article.journalist_id}/articles`)
+              }
+            >
+              {article.journalist_name}
+            </button>
+          ) : (
+            <span>{article.journalist_name}</span>
+          )
+        ) : (
+          <span>Unknown</span>
+        )}
+      </div>
+
+      {article.journalist_email && (
+        <div className="article-meta">
+          <strong>Email:</strong> {article.journalist_email}
+        </div>
+      )}
+
+      {article.journalist_bio && (
+        <div className="article-meta">
+          <strong>Bio:</strong> {article.journalist_bio}
+        </div>
+      )}
+
+      <button
+        className="button-secondary"
+        onClick={() => navigate("/articles")}
+      >
+        ← Back to Articles
+      </button>
     </div>
   );
 }

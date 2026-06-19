@@ -50,7 +50,7 @@ export default function ArticleList() {
     <>
       {isLoading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      
+
       <div className="article-list">
         {articles.map((article) => (
           <ArticleCard
@@ -70,7 +70,9 @@ function ArticleCard({ article, onView, onEdit, onDelete }) {
   return (
     <div className="article-card">
       <div className="article-title">{article.title}</div>
-      <div className="article-author">By {article.journalist}</div>
+      <div className="article-author">
+        By {article.journalist_name || article.journalist || "Unknown"}
+      </div>
 
       <div className="article-actions">
         <button className="button-tertiary" onClick={() => onEdit(article.id)}>
